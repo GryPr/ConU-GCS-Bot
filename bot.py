@@ -5,7 +5,7 @@ import json
 
 client = discord.Client()
 
-courses = ['comp-420', 'comp-69']
+courses = ['comp-123', 'comp-1']
 
 @client.event
 async def on_ready():
@@ -26,14 +26,14 @@ async def on_message(message):
     if message.content.startswith('!roles'):
         for course in courses:
             role = discord.utils.get(guild.roles, name=course)
+            bot_role = discord.utils.get(guild.roles, name='Overwatch Hentai Bot')
             if role is None:
                 role = await guild.create_role(name=course)
-                permissions = {
-                    guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    guild.me: discord.PermissionOverwrite(read_messages=True),
-                    role: discord.PermissionOverwrite(read_messages=True)
-                }
-                channel = await guild.create_text_channel(course, override=permissions, category=category)
+                print(guild.self_role)
+                channel = await guild.create_text_channel(course, category=category)
+                await channel.set_permissions(guild.default_role, read_messages=False)
+                await channel.set_permissions(bot_role, read_messages=True)
+                await channel.set_permissions(role, read_messages=True)
 
 with open('auth.json') as f:
     auth = json.load(f)
