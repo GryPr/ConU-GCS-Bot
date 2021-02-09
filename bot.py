@@ -5,7 +5,12 @@ import json
 
 client = discord.Client()
 
-courses = ['comp-123', 'comp-1']
+courses = []
+with open('courses.txt') as fp:
+   line = fp.readline()
+   while line:
+       courses.append(line.strip())
+       line = fp.readline()
 
 @client.event
 async def on_ready():
