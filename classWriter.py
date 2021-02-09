@@ -46,6 +46,7 @@ nameList = []
 numberList = []
 
 file = open("classes.csv", "w", newline="")
+txtFile = open("courses.txt", "w")
 
 with file:
     header = ["Full Name", "Class Name", "Class Number"]
@@ -60,6 +61,7 @@ with file:
         for y in range(len(numberList)):
             classNameAndNumber = nameList[0] + "-" + numberList[y]
             writer.writerow({"Full Name" : classNameAndNumber, "Class Name" : nameList[0], "Class Number": numberList[y]})
+            txtFile.write(classNameAndNumber + '\n')
     
 
     
