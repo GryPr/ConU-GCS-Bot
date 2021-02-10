@@ -69,7 +69,7 @@ async def on_message(message):
 
     # Leave channel
     if message.content.startswith('$leave '):
-        if message.channel.name == 'bot-requests':
+        if message.channel.name.endswith('bot-requests'):
 
             course = args[1].upper()
             if course in courses:
