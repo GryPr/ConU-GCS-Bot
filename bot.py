@@ -29,7 +29,7 @@ async def on_message(message):
 
     # Join channel
     if message.content.startswith('$join '):
-        if message.channel.name == 'bot-requests':
+        if message.channel.name.endswith('bot-requests'):
             course = args[1].upper()
             if course in courses:
                 role = discord.utils.get(guild.roles, name=course)

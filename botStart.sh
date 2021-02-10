@@ -1,1 +1,1 @@
-while true; do python bot.py && break; done
+while true; do python3 bot.py && break; done
