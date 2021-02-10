@@ -32,17 +32,6 @@ async def on_message(message):
         if message.channel.name.endswith('bot-requests'):
             course = args[1].upper()
             if course in courses:
-                role = discord.utils.get(guild.roles, name=course)
-                channel = discord.utils.get(guild.channels, name=course.lower())
-                bot_role = discord.utils.get(guild.roles, name='Coco')
-
-                if role is None:
-                    role = await guild.create_role(name=course)
-                    channel = await guild.create_text_channel(course, category=category)
-                    await channel.set_permissions(guild.default_role, read_messages=False)
-                    await channel.set_permissions(bot_role, read_messages=True)
-                    await channel.set_permissions(role, read_messages=True)
-
                 category_name = course.split('-')[0]
                 # Get or create original category
                 category = discord.utils.get(guild.categories, name=category_name)
@@ -55,6 +44,17 @@ async def on_message(message):
                     category = discord.utils.get(guild.categories, name=category_name + ' ')
                     if category is None:
                         category = await guild.create_category(name=category_name + ' ')
+
+                role = discord.utils.get(guild.roles, name=course)
+                channel = discord.utils.get(guild.channels, name=course.lower())
+                bot_role = discord.utils.get(guild.roles, name='Coco')
+
+                if role is None:
+                    role = await guild.create_role(name=course)
+                    channel = await guild.create_text_channel(course, category=category)
+                    await channel.set_permissions(guild.default_role, read_messages=False)
+                    await channel.set_permissions(bot_role, read_messages=True)
+                    await channel.set_permissions(role, read_messages=True)
 
                 if channel.category is not None:
                     if channel.category.name == 'recycling-bin':
