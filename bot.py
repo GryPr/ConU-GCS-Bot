@@ -56,8 +56,9 @@ async def on_message(message):
                     if category is None:
                         category = await guild.create_category(name=category_name + ' ')
 
-                if channel.category.name == 'recycling-bin':
-                    await channel.edit(category=category)
+                if channel.category is not None:
+                    if channel.category.name == 'recycling-bin':
+                        await channel.edit(category=category)
 
                 await sender.add_roles(role)
 
