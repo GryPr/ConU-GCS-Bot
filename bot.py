@@ -2,19 +2,22 @@ import discord
 from discord.utils import get
 
 import json
+import os
 
 client = discord.Client()
 
 courses = []
 with open('courses.txt') as fp:
-   line = fp.readline()
-   while line:
-       courses.append(line.strip())
-       line = fp.readline()
+    line = fp.readline()
+    while line:
+        courses.append(line.strip())
+        line = fp.readline()
+
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+
 
 @client.event
 async def on_message(message):
@@ -34,19 +37,22 @@ async def on_message(message):
             if course in courses:
                 category_name = course.split('-')[0]
                 # Get or create original category
-                category = discord.utils.get(guild.categories, name=category_name)
+                category = discord.utils.get(
+                    guild.categories, name=category_name)
 
                 if category is None:
                     category = await guild.create_category(name=category_name)
 
                 # Get or create second category if there are already over 50 channels in the original
                 if await getNumberOfCategoryChannels(category) == 50:
-                    category = discord.utils.get(guild.categories, name=category_name + ' ')
+                    category = discord.utils.get(
+                        guild.categories, name=category_name + ' ')
                     if category is None:
                         category = await guild.create_category(name=category_name + ' ')
 
-                role = discord.utils.get(guild.roles, name=course)
-                channel = discord.utils.get(guild.channels, name=course.lower())
+                # role = discord.utils.get(guild.roles, name=course)
+                channel = discord.utils.get(
+                    guild.channels, name=course.lower())
                 bot_role = discord.utils.get(guild.roles, name='Coco')
 
                 if role is None:
@@ -76,9 +82,11 @@ async def on_message(message):
             course = args[1].upper()
             if course in courses:
                 role = discord.utils.get(guild.roles, name=course)
-                channel = discord.utils.get(guild.channels, name=course.lower())
+                channel = discord.utils.get(
+                    guild.channels, name=course.lower())
 
-                recyclingBinCategory = discord.utils.get(guild.categories, name='recycling-bin')
+                recyclingBinCategory = discord.utils.get(
+                    guild.categories, name='recycling-bin')
                 if recyclingBinCategory is None:
                     recyclingBinCategory = await guild.create_category(name='recycling-bin')
 
@@ -131,21 +139,24 @@ async def classPrint(message):
         '\n**PHYS**: 205, 252, 284' +
         '\n**SOEN**: 228, 287, 321, 331, 341, 342, 343, 344, 345, 357, 363, 384, 385, 387, 390, 422, 423, 448, 449, 471, 487, 490, 491, 498, 499, 6441, GENERAL')
 
+
 async def helpPrint(message):
     await message.channel.send(">>> **Hello:uwu:,I'm Coco:coconut:,your friendly neighbourhood bot:blueheart:**" +
-                         "\n\nYou can use me to join class-specific channels." +
-                         "\n\n**To JOIN a class:**" +
-                         "\n:Check: `$join <code-####>`" +
-                         "\n\n**To LEAVE a class:**" +
-                         "\n:Cross: `$leave <code-####>`" +
-                         "\n\n**Examples:**" +
-                         "\n:small_blue_diamond: `$join comp-442`" +
-                         "\n:small_blue_diamond: `$leave soen-228`" +
-                         "\n\n**Notes:**" +
-                         "\n:small_blue_diamond: Only __course-specific__ channels can be managed by me" +
-                         "\n:small_blue_diamond: Use the $ls command to get a list of all permitted channels")
+                               "\n\nYou can use me to join class-specific channels." +
+                               "\n\n**To JOIN a class:**" +
+                               "\n:Check: `$join <code-####>`" +
+                               "\n\n**To LEAVE a class:**" +
+                               "\n:Cross: `$leave <code-####>`" +
+                               "\n\n**Examples:**" +
+                               "\n:small_blue_diamond: `$join comp-442`" +
+                               "\n:small_blue_diamond: `$leave soen-228`" +
+                               "\n\n**Notes:**" +
+                               "\n:small_blue_diamond: Only __course-specific__ channels can be managed by me" +
+                               "\n:small_blue_diamond: Use the $ls command to get a list of all permitted channels")
 
 # Misc
+
+
 @client.event
 async def isRoleInChannel(channel, course):
     for remainingMember in channel.members:
@@ -155,6 +166,7 @@ async def isRoleInChannel(channel, course):
 
     return False
 
+
 @client.event
 async def getNumberOfCategoryChannels(category):
     count = 0
@@ -163,7 +175,5 @@ async def getNumberOfCategoryChannels(category):
 
     return count
 
-
-with open('auth.json') as f:
-    auth = json.load(f)
-    client.run(auth['TOKEN'])
+with os.getenv['BOT_TOKEN'] as token:
+    client.run(token)
