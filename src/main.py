@@ -4,96 +4,37 @@ from discord.ext.commands import has_permissions, MissingPermissions
 
 import json
 import os
-
-client = discord.Client()
-
-courses = []
-with open(os.path.join(os.path.dirname(__file__), 'resources/courses.txt')) as fp:
-    line = fp.readline()
-    while line:
-        courses.append(line.strip())
-        line = fp.readline()
+from discord.ext import commands
 
 
-@client.event
+async def get_prefix(bot, message):
+    return commands.when_mentioned_or('$')(bot, message)
+
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+
+# Loop to look through cogs folder and load all cogs contained within it
+for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'cogs')):
+    if filename.endswith('.py'):
+        # splicing cuts 3 last characters aka .py
+        bot.load_extension(f'cogs.{filename[:-3]}')
+
+
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('We have logged in as {0.user}'.format(bot))
 
 
-@client.event
-async def on_message(message):
-    guild = message.guild
+# @bot.event
+# async def on_message(message):
+#     if message.author == bot.user:
+#         return
 
-    if message.author == client.user:
-        return
+#     if message.content.startswith('$ls'):
+#         await classPrint(message)
 
-    sender = message.author
-
-    args = message.content.split()
-
-    # Join channel
-    if message.content.startswith('$join '):
-        if message.channel.name.endswith('bot-requests'):
-            course = args[1].upper()
-            if course in courses:
-                category_name = course.split('-')[0]
-                # Get or create original category
-                category = discord.utils.get(
-                    guild.categories, name=category_name)
-
-                if category is None:
-                    category = await guild.create_category(name=category_name)
-
-                # Get or create second category if there are already over 50 channels in the original
-                if await getNumberOfCategoryChannels(category) == 50:
-                    category = discord.utils.get(
-                        guild.categories, name=category_name + ' ')
-                    if category is None:
-                        category = await guild.create_category(name=category_name + ' ')
-
-                channel = discord.utils.get(
-                    guild.channels, name=course.lower())
-                bot_role = discord.utils.get(guild.roles, name='Coco')
-
-                if channel is None:
-                    channel = await guild.create_text_channel(course, category=category)
-                    await channel.set_permissions(guild.default_role, read_messages=False)
-                    await channel.set_permissions(client.user, read_messages=True)
-
-                if channel.overwrites_for(message.author).read_messages == None:
-                    await channel.set_permissions(message.author, read_messages=True)
-
-                await message.channel.send(':white_check_mark: Got it! Gave ' + message.author.mention + ' access to #' + course.lower() + '.')
-
-                await channel.send(message.author.mention + ' joined the chat.')
-
-            else:
-                await message.channel.send('Error: course does not exist!')
-
-    # Leave channel
-    if message.content.startswith('$leave '):
-        if message.channel.name.endswith('bot-requests'):
-
-            course = args[1].upper()
-            if course in courses:
-                role = discord.utils.get(guild.roles, name=course)
-                channel = discord.utils.get(
-                    guild.channels, name=course.lower())
-                if channel.overwrites_for(message.author).read_messages != None:
-                    await channel.set_permissions(
-                        message.author, read_messages=None)
-                    await message.channel.send(":white_check_mark: Got it! Removed " + message.author.mention + "'s access to #" + course.lower() + ".")
-                else:
-                    await message.channel.send(message.author.mention + ", you are not in #" + course.lower() + ".")
-
-            else:
-                await message.channel.send('Error: course does not exist!')
-
-    if message.content.startswith('$ls'):
-        await classPrint(message)
-
-    if message.content.startswith('$help'):
-        await helpPrint(message)
+#     if message.content.startswith('$help'):
+#         await helpPrint(message)
 
 
 # Command helpers
@@ -159,4 +100,4 @@ async def getNumberOfCategoryChannels(category):
 
     return count
 
-client.run(os.getenv('BOT_TOKEN'))
+bot.run(os.getenv('BOT_TOKEN'))
