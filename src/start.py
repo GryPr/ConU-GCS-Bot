@@ -8,7 +8,7 @@ import os
 client = discord.Client()
 
 courses = []
-with open('courses.txt') as fp:
+with open(os.path.join(os.path.dirname(__file__), 'resources/courses.txt')) as fp:
     line = fp.readline()
     while line:
         courses.append(line.strip())
@@ -59,6 +59,8 @@ async def on_message(message):
                     channel = await guild.create_text_channel(course, category=category)
                     await channel.set_permissions(guild.default_role, read_messages=False)
                     await channel.set_permissions(client.user, read_messages=True)
+
+                if channel.overwrites_for(message.author).read_messages == None:
                     await channel.set_permissions(message.author, read_messages=True)
 
                 await message.channel.send(':white_check_mark: Got it! Gave ' + message.author.mention + ' access to #' + course.lower() + '.')
@@ -77,10 +79,9 @@ async def on_message(message):
                 role = discord.utils.get(guild.roles, name=course)
                 channel = discord.utils.get(
                     guild.channels, name=course.lower())
-
-                if discord.Permissions.read_messages in channel.permissions_for(message.author):
-                    channel.set_permissions(
-                        message.author, read_messages=False)
+                if channel.overwrites_for(message.author).read_messages != None:
+                    await channel.set_permissions(
+                        message.author, read_messages=None)
                     await message.channel.send(":white_check_mark: Got it! Removed " + message.author.mention + "'s access to #" + course.lower() + ".")
                 else:
                     await message.channel.send(message.author.mention + ", you are not in #" + course.lower() + ".")

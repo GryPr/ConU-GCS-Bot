@@ -5,7 +5,7 @@
       "name": "Python",
       "type": "python",
       "request": "launch",
-      "program": "./bot.py",
+      "program": "./src/start.py",
       "console": "integratedTerminal",
       "env": {
         "BOT_TOKEN": ""

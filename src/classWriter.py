@@ -1,4 +1,5 @@
 import csv
+import os
 
 aeroString = "AERO: 201, 290, 371, 390, 417, 431, 444, 446, 455, 462, 464, 465, 471, 472, 480, 481, 482, 483, 485, 486, 487, 490, GENERAL"
 bceeString = "BCEE: 231, 342, 343, 344, 345, 371, 451, 452, 455, 464, 465, 466"
@@ -45,12 +46,13 @@ splitList = []
 nameList = []
 numberList = []
 
-file = open("classes.csv", "w", newline="")
+file = open(os.path.join(os.path.dirname(__file__),
+            "resources/classes.csv"), "w", newline="")
 txtFile = open("courses.txt", "w")
 
 with file:
     header = ["Full Name", "Class Name", "Class Number"]
-    writer = csv.DictWriter(file, fieldnames = header)
+    writer = csv.DictWriter(file, fieldnames=header)
     writer.writeheader()
 
     for x in range(len(classList)):
@@ -60,13 +62,6 @@ with file:
 
         for y in range(len(numberList)):
             classNameAndNumber = nameList[0] + "-" + numberList[y]
-            writer.writerow({"Full Name" : classNameAndNumber, "Class Name" : nameList[0], "Class Number": numberList[y]})
+            writer.writerow({"Full Name": classNameAndNumber,
+                            "Class Name": nameList[0], "Class Number": numberList[y]})
             txtFile.write(classNameAndNumber + '\n')
-    
-
-    
-
-
-
-
-
