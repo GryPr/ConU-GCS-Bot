@@ -44,12 +44,14 @@ class Courses(commands.Cog):
                 if channel.overwrites_for(ctx.message.author).read_messages == None:
                     await channel.set_permissions(ctx.message.author, read_messages=True)
 
-                await ctx.message.channel.send(':white_check_mark: Got it! Gave ' + ctx.message.author.mention + ' access to #' + course.lower() + '.')
+                await ctx.message.channel.send('✅ Got it! Gave ' + ctx.message.author.mention + ' access to #' + course.lower() + '.')
 
                 await channel.send(ctx.message.author.mention + ' joined the chat.')
 
             else:
-                await ctx.message.channel.send('Error: course does not exist!')
+                await ctx.message.channel.send('Course does not exist 🤦‍♀️')
+        else:
+            await ctx.message.channel.send('Use commands in bot-requests shithead 💩')
 
     @commands.command()
     async def leave(self, ctx, *, arg):
@@ -61,12 +63,14 @@ class Courses(commands.Cog):
                 if channel.overwrites_for(ctx.message.author).read_messages != None:
                     await channel.set_permissions(
                         ctx.message.author, read_messages=None)
-                    await ctx.message.channel.send(":white_check_mark: Got it! Removed " + ctx.message.author.mention + "'s access to #" + course.lower() + ".")
+                    await ctx.message.channel.send("✅ Got it! Removed " + ctx.message.author.mention + "'s access to #" + course.lower() + ".")
                 else:
-                    await ctx.message.channel.send(ctx.message.author.mention + ", you are not in #" + course.lower() + ".")
+                    await ctx.message.channel.send(ctx.message.author.mention + ", you are not in #" + course.lower() + " " + "😩")
 
             else:
-                await ctx.message.channel.send('Error: course does not exist!')
+                await ctx.message.channel.send('Course does not exist 🤦‍♀️')
+        else:
+            await ctx.message.channel.send('Use commands in bot-requests shithead 💩')
 
     @commands.command()
     async def ls(self, ctx):

@@ -13,6 +13,14 @@ async def get_prefix(bot, message):
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('Command is missing arguments 😪')
+    else:
+        await ctx.send('An unknown error has occured 👀')
+
 # Loop to look through cogs folder and load all cogs contained within it
 for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'cogs')):
     if filename.endswith('.py'):
