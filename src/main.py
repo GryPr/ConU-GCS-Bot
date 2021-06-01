@@ -6,11 +6,9 @@ import json
 import os
 from discord.ext import commands
 
-client = discord.Client()
-
 
 async def get_prefix(bot, message):
-    return commands.when_mentioned_or(str('$'))(bot, message)
+    return commands.when_mentioned_or('$')(bot, message)
 
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents)
@@ -22,22 +20,21 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'cogs')):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('We have logged in as {0.user}'.format(bot))
 
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    await bot.process_commands(message)
+# @bot.event
+# async def on_message(message):
+#     if message.author == bot.user:
+#         return
 
-    if message.content.startswith('$ls'):
-        await classPrint(message)
+#     if message.content.startswith('$ls'):
+#         await classPrint(message)
 
-    if message.content.startswith('$help'):
-        await helpPrint(message)
+#     if message.content.startswith('$help'):
+#         await helpPrint(message)
 
 
 # Command helpers
@@ -103,4 +100,4 @@ async def getNumberOfCategoryChannels(category):
 
     return count
 
-client.run(os.getenv('BOT_TOKEN'))
+bot.run(os.getenv('BOT_TOKEN'))
