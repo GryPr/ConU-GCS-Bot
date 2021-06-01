@@ -96,7 +96,6 @@ async def on_message(message):
 
 
 # Command helpers
-@client.event
 async def classPrint(message):
     await message.channel.send(
         '>>> **The possible course channels to join are:**' +
@@ -143,7 +142,6 @@ async def helpPrint(message):
 # Misc
 
 
-@client.event
 async def isRoleInChannel(channel, course):
     for remainingMember in channel.members:
         memberRole = discord.utils.get(remainingMember.roles, name=course)
@@ -153,7 +151,6 @@ async def isRoleInChannel(channel, course):
     return False
 
 
-@client.event
 async def getNumberOfCategoryChannels(category):
     count = 0
     for remainingChannel in category.channels:
