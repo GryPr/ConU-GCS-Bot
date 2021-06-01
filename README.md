@@ -1,2 +1,3 @@
-# open-source-Coco-bot
-Open source re-implementation of the Coco bot from the ENCS server.
+# ConU GCS Bot
+
+Class channel management bot for the ConU GCS Discord server
