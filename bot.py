@@ -1,5 +1,6 @@
 import discord
 from discord.utils import get
+from discord.ext.commands import has_permissions, MissingPermissions
 
 import json
 import os
@@ -50,23 +51,15 @@ async def on_message(message):
                     if category is None:
                         category = await guild.create_category(name=category_name + ' ')
 
-                # role = discord.utils.get(guild.roles, name=course)
                 channel = discord.utils.get(
                     guild.channels, name=course.lower())
                 bot_role = discord.utils.get(guild.roles, name='Coco')
 
-                if role is None:
-                    role = await guild.create_role(name=course)
+                if channel is None:
                     channel = await guild.create_text_channel(course, category=category)
                     await channel.set_permissions(guild.default_role, read_messages=False)
-                    await channel.set_permissions(bot_role, read_messages=True)
-                    await channel.set_permissions(role, read_messages=True)
-
-                if channel.category is not None:
-                    if channel.category.name == 'recycling-bin':
-                        await channel.edit(category=category)
-
-                await sender.add_roles(role)
+                    await channel.set_permissions(client.user, read_messages=True)
+                    await channel.set_permissions(message.author, read_messages=True)
 
                 await message.channel.send(':white_check_mark: Got it! Gave ' + message.author.mention + ' access to #' + course.lower() + '.')
 
@@ -85,19 +78,12 @@ async def on_message(message):
                 channel = discord.utils.get(
                     guild.channels, name=course.lower())
 
-                recyclingBinCategory = discord.utils.get(
-                    guild.categories, name='recycling-bin')
-                if recyclingBinCategory is None:
-                    recyclingBinCategory = await guild.create_category(name='recycling-bin')
-
-                if role is not None:
-                    await sender.remove_roles(role)
-
-                if channel is not None:
-                    if not await isRoleInChannel(channel, course):
-                        await channel.edit(category=recyclingBinCategory)
-
-                await message.channel.send(":white_check_mark: Got it! Removed " + message.author.mention + "'s access to #" + course.lower() + ".")
+                if discord.Permissions.read_messages in channel.permissions_for(message.author):
+                    channel.set_permissions(
+                        message.author, read_messages=False)
+                    await message.channel.send(":white_check_mark: Got it! Removed " + message.author.mention + "'s access to #" + course.lower() + ".")
+                else:
+                    await message.channel.send(message.author.mention + ", you are not in #" + course.lower() + ".")
 
             else:
                 await message.channel.send('Error: course does not exist!')
@@ -175,5 +161,4 @@ async def getNumberOfCategoryChannels(category):
 
     return count
 
-with os.getenv['BOT_TOKEN'] as token:
-    client.run(token)
+client.run(os.getenv('BOT_TOKEN'))
