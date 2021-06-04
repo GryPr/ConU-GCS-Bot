@@ -3,7 +3,7 @@ import datetime
 import os
 
 db = peewee.SqliteDatabase(os.path.join(
-    os.path.dirname(__file__), '..', 'database.db'))
+    os.path.dirname(__file__), '..', 'data', 'database.db'))
 
 
 class BaseModel(peewee.Model):
