@@ -4,3 +4,4 @@ auth.json
 .vscode/launch.json
 src/cogs/__pycache__/*
 src/database/__pycache__/*
+src/database.db
