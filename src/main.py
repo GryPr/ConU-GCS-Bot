@@ -6,9 +6,12 @@ import json
 import os
 from discord.ext import commands
 
+import database.models
+import database.admindb
+
 
 async def get_prefix(bot, message):
-    return commands.when_mentioned_or('$')(bot, message)
+    return commands.when_mentioned_or(database.admindb.get_prefix(message.guild.id))(bot, message)
 
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents)
@@ -18,6 +21,8 @@ bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('Command is missing arguments 😪')
+    if isinstance(error, discord.ext.commands.errors.CommandNotFound):
+        await ctx.send('Unknown command 😒')
     else:
         await ctx.send('An unknown error has occured 👀')
 
