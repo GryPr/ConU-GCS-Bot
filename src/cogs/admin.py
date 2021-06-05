@@ -140,6 +140,27 @@ class Admin(commands.Cog):
             print(e)
         await ctx.message.channel.send(response)
 
+    @commands.command()
+    async def adminls(self, ctx):
+        courses = database.admindb.course_list(ctx.guild.id)
+        courses = sorted(courses, key=lambda i: i['course_name'])
+        prefixes: typing.List[str] = []
+        message: typing.List[str] = []
+        for course in courses:
+            new_msg = course["course_name"] + " | " + course["category"] + "\n"
+            message.append(new_msg)
+        optimized_message: typing.List[str] = []
+        i: int = 0
+        optimized_message.append("__Course List__ (course_name | category)\n")
+        for x in message:
+            if len(optimized_message[i]) + len(x) >= 2000:
+                i = i + 1
+                optimized_message.append(x)
+            else:
+                optimized_message[i] = optimized_message[i] + x
+        for x in optimized_message:
+            await ctx.message.channel.send(x)
+
 
 def setup(client):
     client.add_cog(Admin(client))
