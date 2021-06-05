@@ -7,14 +7,10 @@ import typing
 
 
 class Admin(commands.Cog):
-    templates: typing.List[str] = []
 
     def __init__(self, client):
         self.client = client
         self.db = database.models.db
-        for filename in os.listdir(os.path.join(os.path.dirname(__file__), '..', 'templates')):
-            if filename.endswith('.txt'):
-                self.templates.append(filename[:-4])
 
     async def cog_check(self, ctx: commands.Context):
         # Check if the user has the administrator permission
@@ -44,17 +40,24 @@ class Admin(commands.Cog):
             print(e)
         await ctx.message.channel.send(response)
 
+    def get_templates(self) -> typing.List[str]:
+        templates: typing.List[str] = []
+        for filename in os.listdir(os.path.join(os.path.dirname(__file__), '..', 'templates')):
+            if filename.endswith('.txt'):
+                templates.append(filename[:-4])
+        return templates
+
     @commands.command()
     async def templatelist(self, ctx):
         response: str = "**Template List**\n"
-        for template in self.templates:
+        for template in self.get_templates():
             response = response + template + "\n"
         await ctx.message.channel.send(response)
 
     @commands.command()
     async def addtemplate(self, ctx: commands.Context, arg):
         response: str = ""
-        if arg in self.templates:
+        if arg in self.get_templates():
             courses: typing.List[str] = []
             try:
                 with open(os.path.join(os.path.dirname(__file__), '..', 'templates', arg + '.txt')) as fp:
@@ -73,7 +76,7 @@ class Admin(commands.Cog):
     @commands.command()
     async def removetemplate(self, ctx: commands.Context, arg):
         response: str = ""
-        if arg in self.templates:
+        if arg in self.get_templates():
             courses: typing.List[str] = []
             try:
                 with open(os.path.join(os.path.dirname(__file__), '..', 'templates', arg + '.txt')) as fp:

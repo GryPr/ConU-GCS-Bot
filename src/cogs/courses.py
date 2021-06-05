@@ -80,14 +80,14 @@ class Courses(commands.Cog):
             [category_courses.append(course["course_name"])
                 for course in courses if course["category"] == category]
             category_msg: str = ""
-            category_msg = category_msg + "__" + category + "__\n"
+            category_msg = category_msg + "**" + category + "**: "
             for course in category_courses:
                 category_msg = category_msg + course.split('-')[1] + ", "
             category_msg = category_msg[:len(category_msg) - 2] + "\n"
             message.append(category_msg)
         optimized_message: typing.List[str] = []
         i: int = 0
-        optimized_message.append("**Course List**\n")
+        optimized_message.append("__Course List__\n")
         for x in message:
             if len(optimized_message[i]) + len(x) >= 2000:
                 i = i + 1
