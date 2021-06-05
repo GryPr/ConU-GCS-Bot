@@ -9,6 +9,7 @@ from discord.ext import commands
 import database.models
 import database.admindb
 import math as m
+from discord.ext.commands.errors import BotMissingPermissions
 
 
 async def get_prefix(bot, message):
@@ -61,6 +62,10 @@ async def on_command_error(ctx: commands.Context, error):
         _message = 'You need the **{}** permission(s) to use this command.'.format(
             fmt)
         await ctx.send(_message)
+        return
+
+    if isinstance(error, BotMissingPermissions):
+        await ctx.send("Bot is missing permissions")
         return
 
     print(error)
