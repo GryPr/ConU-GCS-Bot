@@ -10,12 +10,13 @@ class Courses(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(brief="Join a course channel", description="Join a course channel")
     async def join(self, ctx: commands.Context, *, arg):
         if ctx.channel.name.endswith('bot-requests'):
             course = arg.upper()
             if database.admindb.course_exists(course, ctx.guild.id):
-                category_name = course.split('-')[0]
+                category_name = database.admindb.get_course(
+                    course, ctx.guild.id)["category"]
                 # Get or create original category
                 category = discord.utils.get(
                     ctx.guild.categories, name=category_name)
@@ -49,7 +50,7 @@ class Courses(commands.Cog):
         else:
             await ctx.message.channel.send('Use commands in bot-requests shithead 💩')
 
-    @commands.command()
+    @commands.command(brief="Leave a course channel")
     async def leave(self, ctx: commands.Context, *, arg):
         if ctx.message.channel.name.endswith('bot-requests'):
             course = arg.upper()
@@ -68,23 +69,26 @@ class Courses(commands.Cog):
         else:
             await ctx.message.channel.send('Use commands in bot-requests shithead 💩')
 
-    @commands.command()
+    @commands.command(brief="List all available course channels")
     async def ls(self, ctx):
         courses = database.admindb.course_list(ctx.guild.id)
-        categories: typing.List[str] = []
+        prefixes: typing.List[str] = []
         message: typing.List[str] = []
-        [categories.append(course["category"])
-            for course in courses if course["category"] not in categories]
-        for category in categories:
-            category_courses: typing.List[str] = []
-            [category_courses.append(course["course_name"])
-                for course in courses if course["category"] == category]
-            category_msg: str = ""
-            category_msg = category_msg + "**" + category + "**: "
-            for course in category_courses:
-                category_msg = category_msg + course.split('-')[1] + ", "
-            category_msg = category_msg[:len(category_msg) - 2] + "\n"
-            message.append(category_msg)
+        # Parse the different prefixes
+        [prefixes.append(course["course_name"].split('-')[0])
+            for course in courses if course["course_name"].split('-')[0] not in prefixes]
+        # Go through each prefix and find
+        for prefix in prefixes:
+            prefix_courses: typing.List[str] = []
+            [prefix_courses.append(course["course_name"].split('-')[1])
+                for course in courses if course["course_name"].split('-')[0] == prefix]
+            prefix_msg: str = ""
+            prefix_msg = prefix_msg + "**" + prefix + "**: `"
+            prefix_courses.sort()
+            for course in prefix_courses:
+                prefix_msg = prefix_msg + course + ", "
+            prefix_msg = prefix_msg[:len(prefix_msg) - 2] + "`\n"
+            message.append(prefix_msg)
         optimized_message: typing.List[str] = []
         i: int = 0
         optimized_message.append("__Course List__\n")

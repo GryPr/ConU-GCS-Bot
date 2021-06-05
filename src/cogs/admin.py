@@ -16,25 +16,25 @@ class Admin(commands.Cog):
         # Check if the user has the administrator permission
         return ctx.author.guild_permissions.administrator
 
-    @commands.command()
+    @commands.command(brief="Add one or more courses")
     async def addcourse(self, ctx: commands.Context, *args):
-        argList: list = list(args)
+        arg_list: list = list(args)
         response: str = ""
         try:
             db_return: str = database.admindb.add_course(
-                argList, ctx.guild.id)
+                arg_list, ctx.guild.id)
             response = response + db_return + "\n"
         except BaseException as e:
             print(e)
         await ctx.message.channel.send(response)
 
-    @commands.command()
+    @commands.command(brief="Remove one or more courses")
     async def removecourse(self, ctx: commands.Context, *args: list):
-        argList: list = list(args)
+        arg_list: list = list(args)
         response: str = ""
         try:
             db_return: str = database.admindb.remove_course(
-                argList, ctx.guild.id)
+                arg_list, ctx.guild.id)
             response = response + db_return + "\n"
         except BaseException as e:
             print(e)
@@ -47,14 +47,14 @@ class Admin(commands.Cog):
                 templates.append(filename[:-4])
         return templates
 
-    @commands.command()
+    @commands.command(brief="List all available templates")
     async def templatelist(self, ctx):
         response: str = "**Template List**\n"
         for template in self.get_templates():
             response = response + template + "\n"
         await ctx.message.channel.send(response)
 
-    @commands.command()
+    @commands.command(brief="Add all courses in a template")
     async def addtemplate(self, ctx: commands.Context, arg):
         response: str = ""
         if arg in self.get_templates():
@@ -73,7 +73,7 @@ class Admin(commands.Cog):
             response = response + "❌ Template does not exist"
         await ctx.message.channel.send(response)
 
-    @commands.command()
+    @commands.command(brief="Remove all courses associated with a template")
     async def removetemplate(self, ctx: commands.Context, arg):
         response: str = ""
         if arg in self.get_templates():
@@ -92,10 +92,53 @@ class Admin(commands.Cog):
             response = response + "❌ Template does not exist"
         await ctx.message.channel.send(response)
 
-    @commands.command()
+    @commands.command(brief="Change the server's prefix")
     async def setprefix(self, ctx: commands.Context, arg):
         database.admindb.set_prefix(ctx.guild.id, arg)
         await ctx.message.channel.send("Changed prefix to " + arg)
+
+    @commands.command(brief="Change a course's category", description="\nIf your category has multiple words, use quotation marks as such: \"category name\"\n\nExample: \n$setcategory \"General Electives\" PHYS-204\n$setcategory PHYS PHYS-204")
+    async def setcategory(self, ctx: commands.Context, *args):
+        arg_list: list = list(args)
+        new_category: str = ""
+        # Determine new category
+        if arg_list[0][0] == "\"":
+            i: int = 0
+            found: bool = False
+            temp: str = ""
+            # Find last word
+            for arg in arg_list:
+                i = i + 1
+                temp = temp + arg
+                if arg[-1] == "\"":
+                    found = True
+                    break
+            if found == True:
+                new_category = temp[1:-1]
+            else:
+                new_category = arg_list[0]
+        else:
+            new_category = arg_list[0]
+        response: str = "Changed the following courses' category to " + new_category + ":\n"
+        try:
+            db_return: str = database.admindb.course_category(new_category,
+                                                              arg_list[1:], ctx.guild.id)
+            response = response + db_return + "\n"
+            for arg in arg_list[1:]:
+                if database.admindb.course_exists(arg, ctx.guild.id):
+                    category = discord.utils.get(
+                        ctx.guild.categories, name=new_category)
+                    channel = discord.utils.get(
+                        ctx.guild.channels, name=arg.lower())
+                    if channel == None:
+                        break
+                    if category is None:
+                        category = await ctx.guild.create_category(name=new_category)
+                    await channel.edit(category=category)
+
+        except BaseException as e:
+            print(e)
+        await ctx.message.channel.send(response)
 
 
 def setup(client):
