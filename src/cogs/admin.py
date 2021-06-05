@@ -16,8 +16,12 @@ class Admin(commands.Cog):
             if filename.endswith('.txt'):
                 self.templates.append(filename[:-4])
 
+    async def cog_check(self, ctx: commands.Context):
+        # Check if the user has the administrator permission
+        return ctx.author.guild_permissions.administrator
+
     @commands.command()
-    async def addcourse(self, ctx, *args):
+    async def addcourse(self, ctx: commands.Context, *args):
         argList: list = list(args)
         response: str = ""
         try:
@@ -29,7 +33,7 @@ class Admin(commands.Cog):
         await ctx.message.channel.send(response)
 
     @commands.command()
-    async def removecourse(self, ctx, *args):
+    async def removecourse(self, ctx: commands.Context, *args: list):
         argList: list = list(args)
         response: str = ""
         try:
@@ -48,7 +52,7 @@ class Admin(commands.Cog):
         await ctx.message.channel.send(response)
 
     @commands.command()
-    async def addtemplate(self, ctx, arg):
+    async def addtemplate(self, ctx: commands.Context, arg):
         response: str = ""
         if arg in self.templates:
             courses: typing.List[str] = []
@@ -67,7 +71,7 @@ class Admin(commands.Cog):
         await ctx.message.channel.send(response)
 
     @commands.command()
-    async def removetemplate(self, ctx, arg):
+    async def removetemplate(self, ctx: commands.Context, arg):
         response: str = ""
         if arg in self.templates:
             courses: typing.List[str] = []
@@ -86,7 +90,7 @@ class Admin(commands.Cog):
         await ctx.message.channel.send(response)
 
     @commands.command()
-    async def setprefix(self, ctx, arg):
+    async def setprefix(self, ctx: commands.Context, arg):
         database.admindb.set_prefix(ctx.guild.id, arg)
         await ctx.message.channel.send("Changed prefix to " + arg)
 

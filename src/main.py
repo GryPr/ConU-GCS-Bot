@@ -8,6 +8,7 @@ from discord.ext import commands
 
 import database.models
 import database.admindb
+import math as m
 
 
 async def get_prefix(bot, message):
@@ -18,13 +19,52 @@ bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(ctx: commands.Context, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('Command is missing arguments 😪')
+        return
+
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
-        await ctx.send('Unknown command 😒')
-    else:
-        await ctx.send('An unknown error has occured 👀')
+        return
+
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("You do not have permission to use this command.")
+        return
+
+    if isinstance(error, commands.BotMissingPermissions):
+        missing = [perm.replace('_', ' ').replace(
+            'guild', 'server').title() for perm in error.missing_perms]
+        if len(missing) > 2:
+            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+        else:
+            fmt = ' and '.join(missing)
+        _message = 'I need the **{}** permission(s) to run this command.'.format(
+            fmt)
+        await ctx.send(_message)
+        return
+
+    if isinstance(error, commands.DisabledCommand):
+        await ctx.send('This command has been disabled.')
+        return
+
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.send("This command is on cooldown, please retry in {}s.".format(m.ceil(error.retry_after)))
+        return
+
+    if isinstance(error, commands.MissingPermissions):
+        missing = [perm.replace('_', ' ').replace(
+            'guild', 'server').title() for perm in error.missing_perms]
+        if len(missing) > 2:
+            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+        else:
+            fmt = ' and '.join(missing)
+        _message = 'You need the **{}** permission(s) to use this command.'.format(
+            fmt)
+        await ctx.send(_message)
+        return
+
+    print(error)
+    await ctx.send('An unknown error has occured 👀')
 
 # Loop to look through cogs folder and load all cogs contained within it
 for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'cogs')):

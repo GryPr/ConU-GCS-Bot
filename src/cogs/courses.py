@@ -11,7 +11,7 @@ class Courses(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def join(self, ctx, *, arg):
+    async def join(self, ctx: commands.Context, *, arg):
         if ctx.channel.name.endswith('bot-requests'):
             course = arg.upper()
             if database.admindb.course_exists(course, ctx.guild.id):
@@ -50,7 +50,7 @@ class Courses(commands.Cog):
             await ctx.message.channel.send('Use commands in bot-requests shithead 💩')
 
     @commands.command()
-    async def leave(self, ctx, *, arg):
+    async def leave(self, ctx: commands.Context, *, arg):
         if ctx.message.channel.name.endswith('bot-requests'):
             course = arg.upper()
             if database.admindb.course_exists(course, ctx.guild.id):
