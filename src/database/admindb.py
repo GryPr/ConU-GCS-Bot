@@ -120,3 +120,15 @@ def course_category(category: str, courses: typing.List[str], guild_id: str) -> 
             database.models.Course.update(category=category).where(database.models.Course.guild_id == guild_id and
                                                                    database.models.Course.course_name == course.upper()).execute()
     return response
+
+
+def set_prefix(guild_id: str, prefix: str):
+    find_query = database.models.Guild.select().where(
+        database.models.Guild.guild_id == guild_id)
+    if find_query.exists():
+        update_query = database.models.Guild.update(prefix=prefix).where(
+            database.models.Guild.guild_id == guild_id)
+        update_query.execute()
+    else:
+        database.models.Guild.create(guild_id=guild_id, prefix=prefix)
+    return prefix
