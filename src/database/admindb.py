@@ -21,7 +21,7 @@ def course_exists(name: str, guild_id: str) -> bool:
 
 def get_course(name: str, guild_id: str) -> typing.Union[dict, None]:
     query = database.models.Course.select().where(
-        database.models.Course.guild_id == guild_id)
+        database.models.Course.guild_id == guild_id).where(database.models.Course.course_name == name.upper())
     if query.exists():
         for course in query:
             parsed: dict = {
